@@ -21,7 +21,7 @@ the model was meant to make predictions for.}
 
 \item{model}{A train object created with caret used to extract weights from (based on variable importance) as well as cross-validation folds}
 
-\item{cl}{A cluster object e.g. created with doParallel}
+\item{cl}{A cluster object e.g. created with doParallel. Should only be used if newdata is large.}
 
 \item{train}{A data.frame containing the data used for model training. Only required when no model is given}
 
@@ -107,9 +107,9 @@ spplot(AOA$AOA,col.regions=c("grey","transparent"))
 ####
 library(doParallel)
 library(parallel)
-cl <- makeCluster(6)
+cl <- makeCluster(4)
 registerDoParallel(cl)
-AOA <- aoa(studyArea,model)
+AOA <- aoa(studyArea,model,cl=cl)
 
 ####
 #The AOA can also be calculated without a trained model.

@@ -24,6 +24,8 @@
 #' @importFrom utils combn
 #' @importFrom grDevices rainbow
 #' @importFrom graphics axis plot segments
+#' @importFrom methods as
+#' @importFrom parallel parApply
 #' @keywords package
 #'
 NULL
