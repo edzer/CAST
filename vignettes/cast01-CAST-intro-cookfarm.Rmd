@@ -6,7 +6,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Introduction to CAST}
+  %\VignetteIndexEntry{1. Introduction to CAST}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -43,7 +43,7 @@ library(CAST)
 
 If you need help, see
 
-```{r c2, message = FALSE, warning=FALSE}
+```{r c2, message = FALSE, warning=FALSE, eval=FALSE}
 help(CAST)
 ```
 
