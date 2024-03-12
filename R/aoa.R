@@ -24,7 +24,7 @@
 #' @param CVtrain list. Each element contains the data points used for training during the cross validation iteration (i.e. held back data).
 #' Only required if no model is given and only required if CVtrain is not the opposite of CVtest (i.e. if a data point is not used for testing, it is used for training).
 #' Relevant if some data points are excluded, e.g. when using \code{\link{nndm}}.
-#' @param method Character. Method used for distance calculation. Currently euclidean distance (L2) and Mahalanobis distance (MD) are implemented but only L2 is tested. Note that MD takes considerably longer.
+#' @param method Character. Method used for distance calculation. Currently Euclidean distance (L2) and Mahalanobis distance (MD) are implemented but only L2 is tested. Note that MD takes considerably longer.
 #' @param useWeight Logical. Only if a model is given. Weight variables according to importance in the model?
 #' @param LPD Logical. Indicates whether the local point density should be calculated or not.
 #' @param maxLPD numeric or integer. Only if \code{LPD = TRUE}. Number of nearest neighbors to be considered for the calculation of the LPD. Either define a number between 0 and 1 to use a percentage of the number of training samples for the LPD calculation or a whole number larger than 1 and smaller than the number of training samples. CAUTION! If not all training samples are considered, a fitted relationship between LPD and error metric will not make sense (@seealso \code{\link{DItoErrormetric}})
@@ -297,15 +297,12 @@ aoa <- function(newdata,
     S_inv <- MASS::ginv(S)
   }
 
-  if (calc_LPD == FALSE) {
+  if (! calc_LPD) {
     message("Computing DI of new data...")
     mindist <- rep(NA, nrow(newdata))
-    mindist[okrows] <-
-      .mindistfun(newdataCC, train_scaled, method, S_inv)
+    mindist[okrows] <- .mindistfun(newdataCC, train_scaled, method, S_inv)
     DI_out <- mindist / trainDI$trainDist_avrgmean
-  }
-
-  if (calc_LPD == TRUE) {
+  } else {
     if (verbose) {
       message("Computing DI and LPD of new data...")
     }
@@ -400,7 +397,7 @@ aoa <- function(newdata,
     AOA = AOA
   )
 
-  if (calc_LPD == TRUE) {
+  if (calc_LPD  {
     result$LPD <- LPD
   }
 
@@ -419,15 +416,16 @@ aoa <- function(newdata,
             method,
             S_inv = NULL,
             maxLPD = maxLPD) {
-    if (method == "L2") {
+    if (method == "L2")
       # Euclidean Distance
-      return(FNN::knnx.dist(reference, point, k = maxLPD))
-    } else if (method == "MD") {
-      return(t(sapply(1:dim(point)[1],
+      FNN::knnx.dist(reference, point, k = maxLPD)
+    else if (method == "MD")
+      t(sapply(1:dim(point)[1],
                       function(y)
                         sort(sapply(1:dim(reference)[1],
                                     function(x)
-                                      sqrt(t(point[y, ] - reference[x, ]) %*% S_inv %*% (point[y, ] - reference[x,]) )))[1:maxLPD])))
-    }
-  }
+                                      sqrt(t(point[y, ] - reference[x, ]) %*% S_inv %*% (point[y, ] - reference[x,]) )))[1:maxLPD)))
+    else
+		stop(paste("wrong value for method:", method))
+}
 

@@ -262,7 +262,7 @@ trainDI <- function(model = NA,
 
 
   # calculate trainLPD and avrgLPD according to the CV folds
-  if (LPD == TRUE) {
+  if (LPD) {
     if (verbose) {
       message("Computing LPD of training data...")
       pb <- txtProgressBar(min = 0,
@@ -327,7 +327,7 @@ trainDI <- function(model = NA,
     method = method
   )
 
-  if (LPD == TRUE) {
+  if (LPD) {
     aoa_results$trainLPD <- trainLPD
     aoa_results$avrgLPD <- avrgLPD
   }
@@ -488,16 +488,16 @@ aoa_get_variables <- function(variables, model, train){
 }
 
 
-
 .mindistfun <- function(point, reference, method, S_inv=NULL){
 
   if (method == "L2"){ # Euclidean Distance
-    return(c(FNN::knnx.dist(reference, point, k = 1)))
+    FNN::knnx.dist(reference, point, k = 1)
   } else if (method == "MD"){ # Mahalanobis Distance
-    return(sapply(1:dim(point)[1],
+    sapply(1:dim(point)[1],
                   function(y) min(sapply(1:dim(reference)[1],
-                                         function(x) sqrt( t(point[y,] - reference[x,]) %*% S_inv %*% (point[y,] - reference[x,]) )))))
-  }
+                                         function(x) sqrt( t(point[y,] - reference[x,]) %*% S_inv %*% (point[y,] - reference[x,]) ))))
+  } else
+    stop(stop("wrong value for method:", method))
 }
 
 .alldistfun <- function(point, reference, method, sorted = TRUE,S_inv=NULL){
