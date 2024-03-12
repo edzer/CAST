@@ -4,7 +4,7 @@
     <loc>https://hannameyer.github.io/CAST/404.html</loc>
   </url>
   <url>
-    <loc>https://hannameyer.github.io/CAST/articles/cast01-CAST-intro.html</loc>
+    <loc>https://hannameyer.github.io/CAST/articles/cast01-CAST-intro-cookfarm.html</loc>
   </url>
   <url>
     <loc>https://hannameyer.github.io/CAST/articles/cast02-AOA-tutorial.html</loc>
@@ -46,7 +46,13 @@
     <loc>https://hannameyer.github.io/CAST/reference/clustered_sample.html</loc>
   </url>
   <url>
+    <loc>https://hannameyer.github.io/CAST/reference/errorProfiles.html</loc>
+  </url>
+  <url>
     <loc>https://hannameyer.github.io/CAST/reference/ffs.html</loc>
+  </url>
+  <url>
+    <loc>https://hannameyer.github.io/CAST/reference/geodist.html</loc>
   </url>
   <url>
     <loc>https://hannameyer.github.io/CAST/reference/global_validation.html</loc>
@@ -61,6 +67,9 @@
     <loc>https://hannameyer.github.io/CAST/reference/nndm.html</loc>
   </url>
   <url>
+    <loc>https://hannameyer.github.io/CAST/reference/normalize_DI.html</loc>
+  </url>
+  <url>
     <loc>https://hannameyer.github.io/CAST/reference/plot.html</loc>
   </url>
   <url>
@@ -71,6 +80,9 @@
   </url>
   <url>
     <loc>https://hannameyer.github.io/CAST/reference/print.html</loc>
+  </url>
+  <url>
+    <loc>https://hannameyer.github.io/CAST/reference/splotdata.html</loc>
   </url>
   <url>
     <loc>https://hannameyer.github.io/CAST/reference/trainDI.html</loc>
