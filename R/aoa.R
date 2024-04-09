@@ -446,7 +446,7 @@ aoa <- function(newdata,
                       function(y)
                         sort(sapply(1:dim(reference)[1],
                                     function(x)
-                                      sqrt(t(point[y, ] - reference[x, ]) %*% S_inv %*% (point[y, ] - reference[x,]) )))[1:maxLPD)))
+                                      sqrt(t(point[y, ] - reference[x, ]) %*% S_inv %*% (point[y, ] - reference[x,]) )))[1:maxLPD]))
     else
 		stop(paste("wrong value for method:", method))
 }
