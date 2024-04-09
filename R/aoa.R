@@ -28,6 +28,7 @@
 #' @param useWeight Logical. Only if a model is given. Weight variables according to importance in the model?
 #' @param LPD Logical. Indicates whether the local point density should be calculated or not.
 #' @param maxLPD numeric or integer. Only if \code{LPD = TRUE}. Number of nearest neighbors to be considered for the calculation of the LPD. Either define a number between 0 and 1 to use a percentage of the number of training samples for the LPD calculation or a whole number larger than 1 and smaller than the number of training samples. CAUTION! If not all training samples are considered, a fitted relationship between LPD and error metric will not make sense (@seealso \code{\link{DItoErrormetric}})
+#' @param indices logical. Calculate indices of the training data points that are responsible for the LPD of a new prediction location? Output is a matrix with the dimensions num(raster_cells) x maxLPD. Each row holds the indices of the training data points that are relevant for the specific LPD value at that location. Can be used in combination with exploreAOA(aoa) function from the \href{https://github.com/fab-scm/CASTvis}{CASTvis package} for a better visual interpretation of the results. Note that the matrix can be quite big for examples with a high resolution and a larger number of training samples, which can cause memory issues.
 #' @param verbose Logical. Print progress or not?
 #' @details The Dissimilarity Index (DI), the Local Data Point Density (LPD) and the corresponding Area of Applicability (AOA) are calculated.
 #' If variables are factors, dummy variables are created prior to weighting and distance calculation.
@@ -35,7 +36,7 @@
 #' Interpretation of results: If a location is very similar to the properties
 #' of the training data it will have a low distance in the predictor variable space
 #' (DI towards 0) while locations that are very different in their properties
-#' will have a high DI.
+#' will have a high DI. For easier interpretation see \code{\link{normalize_DI}}
 #' See Meyer and Pebesma (2021) for the full documentation of the methodology.
 #' @note If classification models are used, currently the variable importance can only
 #' be automatically retrieved if models were trained via train(predictors,response) and not via the formula-interface.
@@ -51,7 +52,7 @@
 #' @references Meyer, H., Pebesma, E. (2021): Predicting into unknown space?
 #' Estimating the area of applicability of spatial prediction models.
 #' Methods in Ecology and Evolution 12: 1620-1633. \doi{10.1111/2041-210X.13650}
-#' @seealso \code{\link{calibrate_aoa}}, \code{\link{trainDI}}
+#' @seealso \code{\link{trainDI}}, \code{\link{normalize_DI}}, \code{\link{errorProfiles}}
 #' @examples
 #' \dontrun{
 #' library(sf)
@@ -60,9 +61,10 @@
 #' library(viridis)
 #'
 #' # prepare sample data:
-#' dat <- readRDS(system.file("extdata","Cookfarm.RDS",package="CAST"))
-#' dat <- aggregate(dat[,c("VW","Easting","Northing")],by=list(as.character(dat$SOURCEID)),mean)
-#' pts <- st_as_sf(dat,coords=c("Easting","Northing"))
+#' data(cookfarm)
+#' dat <- aggregate(cookfarm[,c("VW","Easting","Northing")],
+#'    by=list(as.character(cookfarm$SOURCEID)),mean)
+#' pts <- st_as_sf(dat,coords=c("Easting","Northing"),crs=26911)
 #' pts$ID <- 1:nrow(pts)
 #' set.seed(100)
 #' pts <- pts[1:30,]
@@ -135,7 +137,6 @@
 #' @aliases aoa
 
 
-
 aoa <- function(newdata,
                 model=NA,
                 trainDI = NA,
@@ -148,6 +149,7 @@ aoa <- function(newdata,
                 useWeight=TRUE,
                 LPD = FALSE,
                 maxLPD = 1,
+                indices = FALSE,
                 verbose = TRUE) {
 
   # handling of different raster formats
@@ -297,8 +299,10 @@ aoa <- function(newdata,
     S_inv <- MASS::ginv(S)
   }
 
-  if (! calc_LPD) {
-    message("Computing DI of new data...")
+  if (calc_LPD == FALSE) {
+    if (verbose) {
+      message("Computing DI of new data...")
+    }
     mindist <- rep(NA, nrow(newdata))
     mindist[okrows] <- .mindistfun(newdataCC, train_scaled, method, S_inv)
     DI_out <- mindist / trainDI$trainDist_avrgmean
@@ -315,6 +319,9 @@ aoa <- function(newdata,
 
     DI_out <- rep(NA, nrow(newdata))
     LPD_out <- rep(NA, nrow(newdata))
+    if (indices) {
+      Indices_out <- matrix(NA, nrow = nrow(newdata), ncol = maxLPD)
+    }
     for (i in seq(nrow(newdataCC))) {
       knnDist  <- .knndistfun(t(matrix(newdataCC[i,])), train_scaled, method, S_inv, maxLPD = maxLPD)
       knnDI <- knnDist / trainDI$trainDist_avrgmean
@@ -322,6 +329,14 @@ aoa <- function(newdata,
 
       DI_out[okrows[i]] <- knnDI[1]
       LPD_out[okrows[i]] <- sum(knnDI < trainDI$threshold)
+      knnIndex  <- .knnindexfun(t(matrix(newdataCC[i,])), train_scaled, method, S_inv, maxLPD = LPD_out[okrows[i]])
+
+      if (indices) {
+        if (LPD_out[okrows[i]] > 0) {
+          Indices_out[okrows[i],1:LPD_out[okrows[i]]] <- knnIndex
+        }
+      }
+
       if (verbose) {
         setTxtProgressBar(pb, i)
       }
@@ -341,6 +356,10 @@ aoa <- function(newdata,
         message(paste("maxLPD is set to", realMaxLPD))
       }
       trainDI$maxLPD <- realMaxLPD
+    }
+
+    if (indices) {
+      Indices_out <- Indices_out[,1:trainDI$maxLPD]
     }
   }
 
@@ -399,6 +418,9 @@ aoa <- function(newdata,
 
   if (calc_LPD  {
     result$LPD <- LPD
+    if (indices) {
+      result$indices <- Indices_out
+    }
   }
 
   if (verbose) {
@@ -428,4 +450,18 @@ aoa <- function(newdata,
     else
 		stop(paste("wrong value for method:", method))
 }
+
+.knnindexfun <-
+  function (point,
+            reference,
+            method,
+            S_inv = NULL,
+            maxLPD = maxLPD) {
+    if (method == "L2") {
+      # Euclidean Distance
+      return(FNN::knnx.index(reference, point, k = maxLPD))
+    } else if (method == "MD") {
+      # hier muss noch was hin
+    }
+  }
 

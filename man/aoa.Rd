@@ -17,6 +17,7 @@ aoa(
   useWeight = TRUE,
   LPD = FALSE,
   maxLPD = 1,
+  indices = FALSE,
   verbose = TRUE
 )
 }
@@ -52,6 +53,8 @@ Relevant if some data points are excluded, e.g. when using \code{\link{nndm}}.}
 
 \item{maxLPD}{numeric or integer. Only if \code{LPD = TRUE}. Number of nearest neighbors to be considered for the calculation of the LPD. Either define a number between 0 and 1 to use a percentage of the number of training samples for the LPD calculation or a whole number larger than 1 and smaller than the number of training samples. CAUTION! If not all training samples are considered, a fitted relationship between LPD and error metric will not make sense (@seealso \code{\link{DItoErrormetric}})}
 
+\item{indices}{logical. Calculate indices of the training data points that are responsible for the LPD of a new prediction location? Output is a matrix with the dimensions num(raster_cells) x maxLPD. Each row holds the indices of the training data points that are relevant for the specific LPD value at that location. Can be used in combination with exploreAOA(aoa) function from the \href{https://github.com/fab-scm/CASTvis}{CASTvis package} for a better visual interpretation of the results. Note that the matrix can be quite big for examples with a high resolution and a larger number of training samples, which can cause memory issues.}
+
 \item{verbose}{Logical. Print progress or not?}
 }
 \value{
@@ -79,7 +82,7 @@ If variables are factors, dummy variables are created prior to weighting and dis
 Interpretation of results: If a location is very similar to the properties
 of the training data it will have a low distance in the predictor variable space
 (DI towards 0) while locations that are very different in their properties
-will have a high DI.
+will have a high DI. For easier interpretation see \code{\link{normalize_DI}}
 See Meyer and Pebesma (2021) for the full documentation of the methodology.
 }
 \note{
@@ -95,9 +98,10 @@ library(caret)
 library(viridis)
 
 # prepare sample data:
-dat <- readRDS(system.file("extdata","Cookfarm.RDS",package="CAST"))
-dat <- aggregate(dat[,c("VW","Easting","Northing")],by=list(as.character(dat$SOURCEID)),mean)
-pts <- st_as_sf(dat,coords=c("Easting","Northing"))
+data(cookfarm)
+dat <- aggregate(cookfarm[,c("VW","Easting","Northing")],
+   by=list(as.character(cookfarm$SOURCEID)),mean)
+pts <- st_as_sf(dat,coords=c("Easting","Northing"),crs=26911)
 pts$ID <- 1:nrow(pts)
 set.seed(100)
 pts <- pts[1:30,]
@@ -173,7 +177,7 @@ Estimating the area of applicability of spatial prediction models.
 Methods in Ecology and Evolution 12: 1620-1633. \doi{10.1111/2041-210X.13650}
 }
 \seealso{
-\code{\link{calibrate_aoa}}, \code{\link{trainDI}}
+\code{\link{trainDI}}, \code{\link{normalize_DI}}, \code{\link{errorProfiles}}
 }
 \author{
 Hanna Meyer, Fabian Schumacher

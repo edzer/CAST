@@ -1,7 +1,7 @@
 loaddata <- function() {
   # prepare sample data:
-  dat <- readRDS(system.file("extdata","Cookfarm.RDS",package="CAST"))
-  dat <- aggregate(dat[,c("VW","Easting","Northing")],by=list(as.character(dat$SOURCEID)),mean)
+  data("cookfarm")
+  dat <- aggregate(cookfarm[,c("VW","Easting","Northing")],by=list(as.character(cookfarm$SOURCEID)),mean)
   pts <- sf::st_as_sf(dat,coords=c("Easting","Northing"))
   pts$ID <- 1:nrow(pts)
   set.seed(100)
@@ -31,7 +31,7 @@ loaddata <- function() {
 test_that("trainDI works in default for a trained model", {
 dat <- loaddata()
 #...then calculate the DI of the trained model:
-DI <- trainDI(model=dat$model)
+DI <- trainDI(model=dat$model, verbose = F)
 
 #test threshold:
 expect_equal(as.numeric(round(DI$threshold,5)), 0.38986)
@@ -50,7 +50,7 @@ expect_equal(as.numeric(colMeans(DI$train)),
 test_that("trainDI (with LPD = TRUE) works in default for a trained model", {
   dat <- loaddata()
   #...then calculate the DI of the trained model:
-  DI <- trainDI(model=dat$model, LPD = TRUE)
+  DI <- trainDI(model=dat$model, LPD = TRUE, verbose = F)
 
   #test threshold:
   expect_equal(as.numeric(round(DI$threshold,5)), 0.38986)

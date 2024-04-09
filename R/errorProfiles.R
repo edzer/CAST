@@ -23,7 +23,60 @@
 #' Estimating the area of applicability of spatial prediction models.
 #' \doi{10.1111/2041-210X.13650}
 #' @seealso \code{\link{aoa}}
-#' @example inst/examples/ex_errorProfiles.R
+#' @examples
+#' \dontrun{
+#' library(CAST)
+#' library(sf)
+#' library(terra)
+#' library(caret)
+#'
+#' data(splotdata)
+#' predictors <- terra::rast(system.file("extdata","predictors_chile.tif", package="CAST"))
+#'
+#' model <- caret::train(st_drop_geometry(splotdata)[,6:16], splotdata$Species_richness,
+#'    ntree = 10, trControl = trainControl(method = "cv", savePredictions = TRUE))
+#'
+#' AOA <- aoa(predictors, model, LPD = TRUE, maxLPD = 1)
+#'
+#' ### DI ~ error
+#' errormodel_DI <- errorProfiles(model, AOA, variable = "DI")
+#' plot(errormodel_DI)
+#' summary(errormodel_DI)
+#'
+#' expected_error_DI = terra::predict(AOA$DI, errormodel_DI)
+#' plot(expected_error_DI)
+#'
+#' ### LPD ~ error
+#' errormodel_LPD <- errorProfiles(model, AOA, variable = "LPD")
+#' plot(errormodel_LPD)
+#' summary(errormodel_DI)
+#'
+#' expected_error_LPD = terra::predict(AOA$LPD, errormodel_LPD)
+#' plot(expected_error_LPD)
+#'
+#' ### geodist ~ error
+#' errormodel_geodist = errorProfiles(model, locations=splotdata, variable = "geodist")
+#' plot(errormodel_geodist)
+#' summary(errormodel_DI)
+#'
+#' dist <- terra::distance(predictors[[1]],vect(splotdata))
+#' names(dist) <- "geodist"
+#' expected_error_DI <- terra::predict(dist, errormodel_geodist)
+#' plot(expected_error_DI)
+#'
+#'
+#' ### with multiCV = TRUE (for DI ~ error)
+#' errormodel_DI = errorProfiles(model, AOA, multiCV = TRUE, length.out = 3, variable = "DI")
+#' plot(errormodel_DI)
+#'
+#' expected_error_DI = terra::predict(AOA$DI, errormodel_DI)
+#' plot(expected_error_DI)
+#'
+#' # mask AOA based on new threshold from multiCV
+#' mask_aoa = terra::mask(expected_error_DI, AOA$DI > attr(errormodel_DI, 'AOA_threshold'),
+#'   maskvalues = 1)
+#' plot(mask_aoa)
+#' }
 #'
 #'
 #' @export errorProfiles
@@ -126,16 +179,12 @@ errorModel <- function(preds_all, model, window.size, calib, k, m, variable){
   performance$ul <- data.table::shift(performance[,variable],-round(window.size/2),0)
   performance <- performance[!is.na(performance$metric),]
 
+  performance <-  performance[,c(variable,"metric")]
   ### Estimate Error:
   if(calib=="lm"){
-    if (variable == "DI") {
-      errormodel <- lm(metric ~ DI, data = performance)
-    } else if (variable == "LPD") {
-      errormodel <- lm(metric ~ LPD, data = performance)
-    } else if (variable=="geodist"){
-      errormodel <- lm(metric ~ geodist, data = performance)
-    }
+    errormodel <- lm(metric ~ ., data = performance)
   }
+
   if(calib=="scam"){
     if (!requireNamespace("scam", quietly = TRUE)) {
       stop("Package \"scam\" needed for this function to work. Please install it.",
@@ -238,7 +287,7 @@ multiCV <- function(model, locations, length.out, method, useWeight, variable,..
       # NO AOA used here
     }
   }
-  if(variable%in%c("DI","LPD")){
+  if(variable=="DI"|variable=="LPD"){
     attr(preds_all, "AOA_threshold") <- trainDI_new$threshold
     message(paste0("Note: multiCV=TRUE calculated new AOA threshold of ", round(trainDI_new$threshold, 5),
                    "\nThreshold is stored in the attributes, access with attr(error_model, 'AOA_threshold').",

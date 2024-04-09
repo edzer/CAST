@@ -13,7 +13,7 @@ normalize_DI(AOA)
 An object of class \code{aoa}
 }
 \description{
-The DI is normalized by the DI threshold to allow for a more straightforwrd interpretation.
+The DI is normalized by the DI threshold to allow for a more straightforward interpretation.
 A value in the resulting DI larger 1 means that the data are more dissimilar than what has been observed during cross-validation.
 The returned threshold is adjusted accordingly and is, as a consequence, 1.
 }
@@ -24,8 +24,9 @@ library(terra)
 library(caret)
 
 # prepare sample data:
-dat <- readRDS(system.file("extdata","Cookfarm.RDS",package="CAST"))
-dat <- aggregate(dat[,c("VW","Easting","Northing")],by=list(as.character(dat$SOURCEID)),mean)
+data(cookfarm)
+dat <- aggregate(cookfarm[,c("VW","Easting","Northing")],
+   by=list(as.character(cookfarm$SOURCEID)),mean)
 pts <- st_as_sf(dat,coords=c("Easting","Northing"))
 pts$ID <- 1:nrow(pts)
 set.seed(100)
