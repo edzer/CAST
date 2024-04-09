@@ -416,7 +416,7 @@ aoa <- function(newdata,
     AOA = AOA
   )
 
-  if (calc_LPD  {
+  if (calc_LPD == TRUE) {
     result$LPD <- LPD
     if (indices) {
       result$indices <- Indices_out
