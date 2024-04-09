@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">CAST</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,10 +24,11 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/cast01-CAST-intro-cookfarm.html">1. Introduction to CAST</a>
-    <a class="dropdown-item" href="../articles/cast02-AOA-tutorial.html">2. Area of applicability of spatial prediction models</a>
-    <a class="dropdown-item" href="../articles/cast03-AOA-parallel.html">3. AOA in Parallel</a>
-    <a class="dropdown-item" href="../articles/cast04-plotgeodist.html">4. Visualization of nearest neighbor distance distributions</a>
+    <a class="dropdown-item" href="../articles/cast01-CAST-intro.html">1. Introduction to CAST 1.0.0</a>
+    <a class="dropdown-item" href="../articles/cast02-plotgeodist.html">2. Visualization of nearest neighbor distance distributions</a>
+    <a class="dropdown-item" href="../articles/cast03-CV.html">3. Nearest neighbor distance matching Cross-validation in CAST</a>
+    <a class="dropdown-item" href="../articles/cast04-AOA-tutorial.html">4. Area of applicability of spatial prediction models</a>
+    <a class="dropdown-item" href="../articles/cast05-parallel.html">5. Improve computation time of CAST methods</a>
   </div>
 </li>
 <li class="nav-item">
@@ -85,14 +86,14 @@
         <dd>Best subset feature selection</dd>
       </dl><dl><dt>
           
-          <code><a href="calibrate_aoa.html">calibrate_aoa()</a></code> 
-        </dt>
-        <dd>Calibrate the AOA based on the relationship between the DI and the prediction error</dd>
-      </dl><dl><dt>
-          
           <code><a href="clustered_sample.html">clustered_sample()</a></code> 
         </dt>
         <dd>Clustered samples simulation</dd>
+      </dl><dl><dt>
+          
+          <code><a href="cookfarm.html">cookfarm</a></code> 
+        </dt>
+        <dd>Cookfarm soil logger data</dd>
       </dl><dl><dt>
           
           <code><a href="errorProfiles.html">errorProfiles()</a></code> 
@@ -133,16 +134,6 @@
           <code><a href="plot.html">plot(<i>&lt;trainDI&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;aoa&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;nndm&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;knndm&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;ffs&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;geodist&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;errorModel&gt;</i>)</a></code> 
         </dt>
         <dd>Plot CAST classes</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plot_ffs.html">plot_ffs()</a></code> 
-        </dt>
-        <dd>Plot results of a Forward feature selection or best subset selection</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plot_geodist.html">plot_geodist()</a></code> 
-        </dt>
-        <dd>Plot euclidean nearest neighbor distances in geographic space or feature space</dd>
       </dl><dl><dt>
           
           <code><a href="print.html">print(<i>&lt;trainDI&gt;</i>)</a></code> <code><a href="print.html">show.trainDI()</a></code> <code><a href="print.html">print(<i>&lt;aoa&gt;</i>)</a></code> <code><a href="print.html">show.aoa()</a></code> <code><a href="print.html">print(<i>&lt;nndm&gt;</i>)</a></code> <code><a href="print.html">show.nndm()</a></code> <code><a href="print.html">print(<i>&lt;knndm&gt;</i>)</a></code> <code><a href="print.html">show.knndm()</a></code> <code><a href="print.html">print(<i>&lt;ffs&gt;</i>)</a></code> <code><a href="print.html">show.ffs()</a></code> 
