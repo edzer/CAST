@@ -1,3 +1,9 @@
+# `CAST` 1.0.2
+* bug fix: tests run conditionally
+
+# `CAST` 1.0.1
+* bug fix: fix failed tests in global_validation
+
 # `CAST` 1.0.0
 * new features:
   * calculate local point density within AOA
